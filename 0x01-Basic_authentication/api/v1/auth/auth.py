@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" 
+"""
   Manage API authentication
 """
 
@@ -8,13 +8,13 @@ from typing import TypeVar, List
 
 
 class Auth:
-    """ 
-      Create a class to manage the API authentication.
+    """
+       Create a class to manage the API authentication.
     """
 
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
-        """ 
-          Require authentication before proceeding
+        """
+           Require authentication before proceeding
         """
         if not path or not excluded_paths:
             return True
@@ -37,7 +37,7 @@ class Auth:
             return request.headers.get("Authorization")
 
     def current_user(self, request=None) -> TypeVar('User'):
-        """ 
+        """
            Change if user is current login
         """
         return None
