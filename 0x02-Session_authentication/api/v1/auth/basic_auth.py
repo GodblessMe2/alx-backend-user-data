@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" 
+"""
   Manage API authentication
 """
 
@@ -16,7 +16,7 @@ class BasicAuth(Auth):
     def extract_base64_authorization_header(self, authH: str) -> str:
         """ def extract_base64_authorization_header.
         """
-        if not authH or type(authH) != str or not authH.startswith("Basic "):
+        if not authH or type(authH) != str or not authH.startswith("Basic"):
             return
         return "".join(authH.split(" ")[1:])
 
