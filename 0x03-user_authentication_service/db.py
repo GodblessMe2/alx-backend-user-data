@@ -4,9 +4,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
-from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm.exc import NoResultFound
-from typing import TypeVar
+from sqlalchemy.exc import InvalidRequestError
 
 from user import Base, User
 
@@ -18,7 +17,8 @@ class DB:
     def __init__(self) -> None:
         """Initialize a new DB instance
         """
-        self._engine = create_engine("sqlite:///a.db", echo=True)
+        self._engine = create_engine("sqlite:///a.db",
+                                     echo=False)
         Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)
         self.__session = None
@@ -33,19 +33,27 @@ class DB:
         return self.__session
 
     def add_user(self, email: str, hashed_password: str) -> User:
-        """add_user.
         """
-        if not email or not hashed_password:
-            return None
+        Create a User object and save it to the database
+        Args:
+            email (str): user's email address
+            hashed_password (str): password hashed by bcrypt's hashpw
+        Return:
+            Newly created User object
+        """
         user = User(email=email, hashed_password=hashed_password)
-        session = self._session
-        session.add(user)
-        session.commit()
+        self._session.add(user)
+        self._session.commit()
         return user
 
     def find_user_by(self, **kwargs) -> User:
         """
-         find_user_by.
+        Return a user who has an attribute matching the attributes passed
+        as arguments
+        Args:
+            attributes (dict): a dictionary of attributes to match the user
+        Return:
+            matching user or raise error
         """
         all_users = self._session.query(User)
         for k, v in kwargs.items():
@@ -57,7 +65,15 @@ class DB:
         raise NoResultFound
 
     def update_user(self, user_id: int, **kwargs) -> None:
-        """update_user.
+        """
+        Update a user's attributes
+        Args:
+            user_id (int): user's id
+            kwargs (dict): dict of key, value pairs representing the
+                           attributes to update and the values to update
+                           them with
+        Return:
+            No return value
         """
         try:
             usr = self.find_user_by(id=user_id)
