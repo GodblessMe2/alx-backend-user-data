@@ -47,21 +47,25 @@ class DB:
         """
          find_user_by.
         """
-        if not kwargs or any(x not in VALID_FIELDS for x in kwargs):
-            raise InvalidRequestError
-        session = self._session
-        try:
-            return session.query(User).filter_by(**kwargs).one()
-        except Exception:
-            raise NoResultFound
+        all_users = self._session.query(User)
+        for k, v in kwargs.items():
+            if k not in User.__dict__:
+                raise InvalidRequestError
+            for usr in all_users:
+                if getattr(usr, k) == v:
+                    return usr
+        raise NoResultFound
 
     def update_user(self, user_id: int, **kwargs) -> None:
         """update_user.
         """
-        session = self._session
-        user = self.find_user_by(id=user_id)
+        try:
+            usr = self.find_user_by(id=user_id)
+        except NoResultFound:
+            raise ValueError()
         for k, v in kwargs.items():
-            if k not in VALID_FIELDS:
+            if hasattr(usr, k):
+                setattr(usr, k, v)
+            else:
                 raise ValueError
-            setattr(user, k, v)
-        session.commit()
+        self._session.commit()
